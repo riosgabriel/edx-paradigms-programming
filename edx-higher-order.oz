@@ -78,4 +78,35 @@ C = [~1 ~2 ~3]
 F = {Build D C}
 {Browse {F 1}}
 
-   
+declare
+fun {Transform L}
+   local Bind in 
+      fun {Bind Rec Props Values}
+         case Props 
+         of nil then Rec
+         [] H|T then Rec.H = Values.1
+            {Bind Rec T Values.2}
+         end
+      end
+      {Bind {Record.make L.1 L.2.1} L.2.1 L.2.2.1} % z(a:_ b:_)
+   end
+end
+
+declare
+fun {Transform L}
+   local Bind Assign in
+      fun {Assign R P V}
+         R.P = V
+         R
+      end
+      
+      fun {Bind Rec Props Values}
+         case Values
+            of nil then Rec
+            [] H|T then {Bind {Assign Rec Props.1 Values.1} T Values.2}
+            [] [A B C] then {Transform Values}
+         end
+      end
+   {Bind {Record.make L.1 L.2.1} L.2.1 L.2.2.1} % z(a:_ b:_)
+   end
+end
